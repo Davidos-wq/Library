@@ -19,17 +19,21 @@ async def message_handler(message: Message,state:FSMContext):
 
 @form_router.message(Form.name)
 async def process_name(message:Message,state:FSMContext):
+    await state.update_data(name=message.text)
     await message.answer("Введіть своє прізвище")
     await state.set_state(Form.lastname)
 
 @form_router.message(Form.lastname)
 async def process_lastname(message:Message,state:FSMContext):
+    await state.update_data(lastname=message.text)
     await message.answer("Виберіть ваший улюблений жанр із запропонованих",reply_markup=get_my_keyboard())
 
 @form_router.callback_query()
 async def process_genre(callback:CallbackQuery,state:FSMContext):
     genre = callback.data
+    all_data = await state.get_data() # Всі тимчасові збережені зміни
+
+
+
     
-    await callback.message.answer(
-        f"Ви вибрали жанр: {genre}"
-    )
+    

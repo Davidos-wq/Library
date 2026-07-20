@@ -3,18 +3,29 @@ from aiogram import Bot,Dispatcher
 from project_run.registration import form_router
 from models import init_models
 
-from os import getenv
+import os
+from pathlib import Path
+from dotenv import load_dotenv, find_dotenv
 
-TOKEN = getenv("BOT_TOKEN")
+dotenv_path = find_dotenv()
+print(f"DEBUG: Файл .env знайдено за шляхом: {dotenv_path}")
+
+load_dotenv(dotenv_path, override=True)
+
+token = os.getenv("BOT_TOKEN")
+print(f"DEBUG: Значення BOT_TOKEN: '{token}'")
+
+if not token:
+    print("ПОМИЛКА: Змінну BOT_TOKEN не знайдено!")
 
 dp = Dispatcher()
 
 async def main() -> None:
     await init_models()
-    
+
     dp.include_router(form_router)
-    bot = Bot(token=TOKEN)
+    bot = Bot(token=token)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    asyncio.run(main)
+    asyncio.run(main())

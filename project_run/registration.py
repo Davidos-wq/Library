@@ -4,7 +4,7 @@ from aiogram import Bot,Router
 from aiogram.fsm.state import State,StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart
-from registrationbuttons import get_my_keyboard
+from project_run.registrationbuttons import get_my_keyboard
 from crud import add_info
 from database import async_session_factroy
 from aiogram import F

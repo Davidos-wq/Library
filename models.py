@@ -13,7 +13,7 @@ class User(Base):
     name:Mapped[str]
     lastname:Mapped[str]
     loved_genre:Mapped[str]
-    borrowed_books:Mapped[List["BorrowedBook"]] = relationship(back_populates="book_info")
+    user_books:Mapped[List["BorrowedBook"]] = relationship(back_populates="bought_book")
 
 
 class Book(Base):
@@ -24,11 +24,11 @@ class Book(Base):
     author:Mapped[str]
     year:Mapped[int]
     genre:Mapped[str]
-    borrowed_connection:Mapped[List["BorrowedBook"]] = relationship(back_populates="book_info")
+    borowed_connection:Mapped[List["BorrowedBook"]] = relationship(back_populates="book_info")
 
 
 class BorrowedBook(Base):
-    __table__ = "borrowed_books"
+    __tablename__ = "borrowed_books"
 
     id:Mapped[int] = mapped_column(primary_key = True)
     user_id:Mapped[int] = mapped_column(ForeignKey("users.id"))
@@ -45,7 +45,7 @@ class BorrowedBook(Base):
     )
 
     book_info:Mapped["Book"] = relationship(back_populates="borowed_connection")
-    bought_book:Mapped["User"] = relationship(back_populates="borrowed_books")
+    bought_book:Mapped["User"] = relationship(back_populates="user_books")
 
 async def init_models():
     async with engine.begin() as conn:

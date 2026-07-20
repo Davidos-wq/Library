@@ -13,6 +13,7 @@ def get_my_keyboard():
    builder.button(text="Жахи",callback_data="Horror")
    builder.button(text="Сучасна класика",callback_data="Literary Fiction")
 
+   builder.adjust(2)
    
    return builder.as_markup()
 

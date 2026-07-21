@@ -6,8 +6,19 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 menu_router = Router()
 
+def create_menu():
+    builder = InlineKeyboardBuilder()
+    builder.add(text="Показати всі книжки",callback_data="show_all")
+    builder.add(text="Знайти книгу",callback_data="found_book")
+    builder.add(text="Взяти книгу",callback_data="get_book")
+    builder.add(text="Повернути книгу",callback_data="return_book")
+    builder.add(text="Подивитися свої книги",callback_data="show_yourbooks")
 
+    builder.adjust(1)
+
+    return builder.as_markup()
 
 
 @menu_router.message(Command("show_menu"))
 async def show_menu(message:Message):
+      await message.answer("Меню вибору",reply_markup=create_menu())

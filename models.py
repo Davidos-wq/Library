@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column,relationship
-from sqlalchemy import ForeignKey,DateTime
+from sqlalchemy import ForeignKey,DateTime,select
 from typing import List
-from database import Base,engine
+from database import Base,engine,async_session_factroy
 from datetime import datetime,timedelta
+import json
 
 class User(Base):
     __tablename__ = "users"
@@ -50,4 +51,24 @@ class BorrowedBook(Base):
 async def init_models():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    
+async def init_db():
+    async with async_session_factroy() as session:
+        result = await session.execute(select(Book).limit(1)) # Пошук книжок
+        if result.scalar_one_or_none() is None:
+           
+           with open('my_books.json','r',encoding='utf-8') as file:
+               books = json.load(file)
+
+           for genre, books_list in books.items():
+                for book in books_list:
+                    new_book = Book(
+                        title=book.get("title"),
+                        author=book.get("author"),
+                        year=book.get("year"),
+                        genre=book.get("genre")
+                    )
+                session.add(new_book)
+                                      
+        await session.commit()  
 

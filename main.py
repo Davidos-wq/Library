@@ -1,7 +1,7 @@
 import asyncio
 from aiogram import Bot,Dispatcher
 from project_run.registration import form_router
-from models import init_models
+from models import init_models,init_db
 
 import os
 from pathlib import Path
@@ -22,6 +22,7 @@ dp = Dispatcher()
 
 async def main() -> None:
     await init_models()
+    await init_db()
 
     dp.include_router(form_router)
     bot = Bot(token=token)

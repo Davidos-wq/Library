@@ -48,7 +48,7 @@ async def process_genre(callback:CallbackQuery,state:FSMContext):
         await add_info(session,user_id,
                        name,lastname,genre)
     
-    await callback.message.answer(reply_markup=create_menu())
+    await callback.message.answer("Меню",reply_markup=create_menu())
     
 
         

@@ -8,11 +8,11 @@ menu_router = Router()
 
 def create_menu():
     builder = InlineKeyboardBuilder()
-    builder.add(text="Показати всі книжки",callback_data="show_all")
-    builder.add(text="Знайти книгу",callback_data="found_book")
-    builder.add(text="Взяти книгу",callback_data="get_book")
-    builder.add(text="Повернути книгу",callback_data="return_book")
-    builder.add(text="Подивитися свої книги",callback_data="show_yourbooks")
+    builder.button(text="Показати всі книжки",callback_data="show_all")
+    builder.button(text="Знайти книгу",callback_data="found_book")
+    builder.button(text="Взяти книгу",callback_data="get_book")
+    builder.button(text="Повернути книгу",callback_data="return_book")
+    builder.button(text="Подивитися свої книги",callback_data="show_yourbooks")
 
     builder.adjust(1)
 

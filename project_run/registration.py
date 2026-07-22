@@ -8,6 +8,7 @@ from project_run.registrationbuttons import get_my_keyboard
 from crud import add_info
 from database import async_session_factroy
 from aiogram import F
+from showcase.main_menu import create_menu
 
 form_router = Router()
 
@@ -34,6 +35,7 @@ async def process_lastname(message:Message,state:FSMContext):
 @form_router.callback_query(F.data.in_(["Science Fiction","Fantasy",
                                         "Mystery","Romance","Horror",
                                         "Literary Fiction"]))
+
 async def process_genre(callback:CallbackQuery,state:FSMContext):
   
     all_data = await state.get_data() # Всі тимчасові збережені зміни
@@ -47,7 +49,7 @@ async def process_genre(callback:CallbackQuery,state:FSMContext):
         await add_info(session,user_id,
                        name,lastname,genre)
     
-    await callback.message.answer("Ви були зареєстровані")
+    await callback.message.answer("Меню",reply_markup=create_menu())
     
 
         

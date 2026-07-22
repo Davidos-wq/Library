@@ -66,9 +66,7 @@ async def init_db():
                         title=book.get("title"),
                         author=book.get("author"),
                         year=book.get("year"),
-                        genre=book.get("genre")
-                    )
-                session.add(new_book)
-                                      
+                        genre=book.get("genre"))
+                    session.add(new_book)
         await session.commit()  
 

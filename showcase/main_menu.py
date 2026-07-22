@@ -1,0 +1,61 @@
+from aiogram.filters import Command
+from aiogram.types import InlineKeyboardButton,InlineKeyboardMarkup,Message,CallbackQuery
+from aiogram import Router
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram import F
+
+from showcase.scroll_system import move_page
+from database import async_session_factroy
+
+menu_router = Router()
+
+def create_menu():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Показати всі книжки",callback_data="showall_0")
+    builder.button(text="Знайти книгу",callback_data="found_book")
+    builder.button(text="Взяти книгу",callback_data="get_book")
+    builder.button(text="Повернути книгу",callback_data="return_book")
+    builder.button(text="Подивитися свої книги",callback_data="show_yourbooks")
+
+    builder.adjust(1)
+
+    return builder.as_markup()
+
+
+@menu_router.message(Command("show_menu"))
+async def show_menu(message:Message):
+      await message.answer("Меню вибору",reply_markup=create_menu())
+
+
+@menu_router.callback_query(F.data.startswith("showall_"))
+async def show_books(callback: CallbackQuery):
+  curent_data = callback.data.split("_")
+  num = int(curent_data[1])  # Тут буде 0 (або інше число, якщо передасте далі)
+
+  async with async_session_factroy() as session:
+    await callback.message.edit_text(
+        text="Книжки",
+        reply_markup=await move_page(session, num),
+    )
+
+  await callback.answer()
+
+@menu_router.callback_query(
+    F.data.contains("forward_") | F.data.contains("back_")
+)
+async def front_move(callback: CallbackQuery):
+  curent_data = callback.data.split("_")
+  num = int(curent_data[1])
+
+  if curent_data[0] == "forward":
+    num += 10
+  elif curent_data[0] == "back":
+    num -= 10
+
+  async with async_session_factroy() as session:
+    await callback.message.edit_text(
+        text="Книжки",
+        reply_markup= await move_page(session, num),
+    )
+
+  await callback.answer()

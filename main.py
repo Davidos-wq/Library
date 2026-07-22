@@ -6,6 +6,7 @@ from models import init_models,init_db
 import os
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
+from showcase.main_menu import menu_router
 
 dotenv_path = find_dotenv()
 print(f"DEBUG: Файл .env знайдено за шляхом: {dotenv_path}")
@@ -25,6 +26,8 @@ async def main() -> None:
     await init_db()
 
     dp.include_router(form_router)
+    dp.include_router(menu_router)
+    
     bot = Bot(token=token)
     await dp.start_polling(bot)
 

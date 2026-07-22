@@ -35,6 +35,7 @@ async def process_lastname(message:Message,state:FSMContext):
 @form_router.callback_query(F.data.in_(["Science Fiction","Fantasy",
                                         "Mystery","Romance","Horror",
                                         "Literary Fiction"]))
+
 async def process_genre(callback:CallbackQuery,state:FSMContext):
   
     all_data = await state.get_data() # Всі тимчасові збережені зміни

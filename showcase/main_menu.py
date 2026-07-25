@@ -4,10 +4,18 @@ from aiogram import Router
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import F
 
+from aiogram.fsm.state import State,StatesGroup
+from aiogram.fsm.context import FSMContext
+
 from showcase.scroll_system import move_page
+from crud import found_book
 from database import async_session_factroy
 
 menu_router = Router()
+
+class Found(StatesGroup):
+   book_name = State()
+
 
 def create_menu():
     builder = InlineKeyboardBuilder()
@@ -25,6 +33,22 @@ def create_menu():
 @menu_router.message(Command("show_menu"))
 async def show_menu(message:Message):
       await message.answer("Меню вибору",reply_markup=create_menu())
+
+
+@menu_router.callback_query(F.data == "found_book")
+async def enter_book_callback(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer("Введіть назву вашої книги")
+    await state.set_state(Found.book_name)
+    await callback.answer()
+
+
+@menu_router.message(Found.book_name)
+async def show_result(message: Message, state: FSMContext):
+    async with async_session_factroy() as session:
+        is_found = await found_book(session, message.text, message)
+
+    if is_found:
+        await state.clear()
 
 
 @menu_router.callback_query(F.data.startswith("showall_"))

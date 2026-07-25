@@ -21,20 +21,20 @@ class User(Base):
 class Book(Base):
     __tablename__ = "books"
 
-    id:Mapped[int] = mapped_column(primary_key = True)
-    title:Mapped[str]
-    author:Mapped[str]
-    year:Mapped[int]
-    genre:Mapped[str]
-    borowed_connection:Mapped[List["BorrowedBook"]] = relationship(back_populates="book_info")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str]
+    author: Mapped[str]
+    year: Mapped[int]
+    genre: Mapped[str]
+    borowed_connection: Mapped[List["BorrowedBook"]] = relationship(back_populates="book_info")
 
     __table_args__ = (
         Index(
             "ix_title_trgm",
-            title,
+            "title",
             postgresql_using="gin",
-            postgresql_ops={"title":"gin_trgm_ops"}
-        )
+            postgresql_ops={"title": "gin_trgm_ops"}
+        ),
     )
 
 

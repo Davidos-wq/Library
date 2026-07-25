@@ -29,31 +29,47 @@ async def add_info(session,user_id,
     await session.commit()
 
 
-async def foun_book(session,book_tile,message:Message):
+from sqlalchemy import select, text
+from aiogram.types import Message
 
-    stmt = select(Book).where(Book.title==book_tile)
+async def found_book(session, book_title: str, message: Message) -> bool:
+    stmt = select(Book).where(Book.title.ilike(book_title))
     result = await session.execute(stmt)
     book = result.scalar_one_or_none()
 
     if book:
-        await message.answer("Книга знайдена")
-        await message.answer(f"{book.title}",
-                             f"{book.author}",
-                             f"{book.year}",
-                             f"{book.genre}")
-
-    else:
-        stmt = (
-            select(Book)
-            .where(Book.title.op('%')(book_tile))
-            .order_by(text("title <-> :query"))
-            .params(query=book_tile)
-            .limit(5)
+        response_text = (
+            f"<b>Книгу знайдено!</b>\n\n"
+            f"<b>Назва:</b> {book.title}\n"
+            f"<b>Автор:</b> {book.author}\n"
+            f"<b>Рік:</b> {book.year}\n"
+            f"<b>Жанр:</b> {book.genre}"
         )
+        await message.answer(response_text, parse_mode="HTML")
+        return True  # Книгу знайдено успішно
 
-        result = await session.execute(stmt)
-        found_books = result.scalars().all()
+    # 2. Нечіткий пошук (trigram)
+    stmt = (
+        select(Book)
+        .where(Book.title.op('%')(book_title))
+        .order_by(text("title <-> :query"))
+        .params(query=book_title)
+        .limit(5)
+    )
 
-        await message.answer("Можливо ви мали на увазі")
-        for book in found_books:
-            await message.answer(book.title)
+    result = await session.execute(stmt)
+    found_books = result.scalars().all()
+
+    if not found_books:
+        await message.answer("Книгу не знайдено. Спробуйте ввести іншу назву:")
+        return False 
+
+    suggestions = ["<b>Можливо, ви мали на увазі:</b>"]
+    for b in found_books:
+        suggestions.append(f"• {b.title} ({b.author})")
+    
+    suggestions.append("\nСпробуйте ввести назву ще раз:")
+
+    await message.answer("\n".join(suggestions), parse_mode="HTML")
+    return False 
+

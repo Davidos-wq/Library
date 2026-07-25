@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column,relationship
-from sqlalchemy import ForeignKey,DateTime,select
+from sqlalchemy import text,select
+from sqlalchemy import ForeignKey,DateTime,Index
 from typing import List
 from database import Base,engine,async_session_factroy
 from datetime import datetime,timedelta
@@ -27,6 +28,15 @@ class Book(Base):
     genre:Mapped[str]
     borowed_connection:Mapped[List["BorrowedBook"]] = relationship(back_populates="book_info")
 
+    __table_args__ = (
+        Index(
+            "ix_title_trgm",
+            title,
+            postgresql_using="gin",
+            postgresql_ops={"title":"gin_trgm_ops"}
+        )
+    )
+
 
 class BorrowedBook(Base):
     __tablename__ = "borrowed_books"
@@ -47,6 +57,7 @@ class BorrowedBook(Base):
 
     book_info:Mapped["Book"] = relationship(back_populates="borowed_connection")
     bought_book:Mapped["User"] = relationship(back_populates="user_books")
+
 
 async def init_models():
     async with engine.begin() as conn:

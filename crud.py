@@ -1,10 +1,11 @@
 from sqlalchemy import select,delete,func
-from sqlalchemy import or_
+from sqlalchemy import or_,text
 from sqlalchemy.orm import joinedload,selectinload,with_loader_criteria
 from models import Book,User,BorrowedBook
 from sqlalchemy.exc import NoResultFound
 from datetime import datetime
 import time
+from aiogram.types import Message
 
 
 async def add_info(session,user_id,
@@ -26,3 +27,33 @@ async def add_info(session,user_id,
         
         session.add(user)  
     await session.commit()
+
+
+async def foun_book(session,book_tile,message:Message):
+
+    stmt = select(Book).where(Book.title==book_tile)
+    result = await session.execute(stmt)
+    book = result.scalar_one_or_none()
+
+    if book:
+        await message.answer("Книга знайдена")
+        await message.answer(f"{book.title}",
+                             f"{book.author}",
+                             f"{book.year}",
+                             f"{book.genre}")
+
+    else:
+        stmt = (
+            select(Book)
+            .where(Book.title.op('%')(book_tile))
+            .order_by(text("title <-> :query"))
+            .params(query=book_tile)
+            .limit(5)
+        )
+
+        result = await session.execute(stmt)
+        found_books = result.scalars().all()
+
+        await message.answer("Можливо ви мали на увазі")
+        for book in found_books:
+            await message.answer(book.title)

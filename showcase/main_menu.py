@@ -8,7 +8,7 @@ from aiogram.fsm.state import State,StatesGroup
 from aiogram.fsm.context import FSMContext
 
 from showcase.scroll_system import move_page
-from crud import found_book
+from crud import found_book,add_book
 from database import async_session_factroy
 
 menu_router = Router()
@@ -21,7 +21,6 @@ def create_menu():
     builder = InlineKeyboardBuilder()
     builder.button(text="Показати всі книжки",callback_data="showall_0")
     builder.button(text="Знайти книгу",callback_data="found_book")
-    builder.button(text="Взяти книгу",callback_data="get_book")
     builder.button(text="Повернути книгу",callback_data="return_book")
     builder.button(text="Подивитися свої книги",callback_data="show_yourbooks")
 
@@ -65,8 +64,7 @@ async def show_books(callback: CallbackQuery):
   await callback.answer()
 
 @menu_router.callback_query(
-    F.data.contains("forward_") | F.data.contains("back_")
-)
+    F.data.contains("forward_") | F.data.contains("back_"))
 async def front_move(callback: CallbackQuery):
   curent_data = callback.data.split("_")
   num = int(curent_data[1])
@@ -83,3 +81,10 @@ async def front_move(callback: CallbackQuery):
     )
 
   await callback.answer()
+
+
+@menu_router.callback_query(F.data.contains("item_"))
+async def update_info(callback:CallbackQuery):
+  async with async_session_factroy() as session:
+     await add_book(session,callback.from_user.id,
+              callback.data)

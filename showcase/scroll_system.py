@@ -7,7 +7,7 @@ async def move_page(session,command):
 
     builder = InlineKeyboardBuilder()
 
-    stmt = (select(Book.title).
+    stmt = (select(Book.title,Book.id).
             offset(command).
             limit(10))
     
@@ -16,7 +16,7 @@ async def move_page(session,command):
 
     for book in all_books:
         builder.add(InlineKeyboardButton
-                    (text=book,callback_data=f"item_{book}")
+                    (text=book.title,callback_data=f"item_{book.id}")
                     )
     
     if command<20:

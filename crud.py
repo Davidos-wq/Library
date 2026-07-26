@@ -73,3 +73,29 @@ async def found_book(session, book_title: str, message: Message) -> bool:
     await message.answer("\n".join(suggestions), parse_mode="HTML")
     return False 
 
+
+async def add_book(session,tg_id,book_query,message:Message):
+    
+    book_id = int(book_query.split("_")[1])
+
+    user_stmt = select(User.id).where(User.tg_id == tg_id)
+    result = await session.execute(user_stmt)
+    user_id = result.scalar_one_or_none()
+
+    borowed_books = select(BorrowedBook.time_end).where(BorrowedBook.book_id==book_id)
+    existing_borrow = (await session.execute(borowed_books)).scalar_one_or_none()
+
+    if not existing_borrow or existing_borrow<datetime.now():
+
+        new_borrow = BorrowedBook(
+            user_id=user_id,
+            book_id=book_id
+        )
+
+        session.add(new_borrow)
+        await session.commit()
+
+        await message.answer('Книга була додана до вашої біліотеки')
+
+    else:
+        await message.answer('Наразі книга недоступна')

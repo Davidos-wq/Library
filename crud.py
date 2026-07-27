@@ -6,6 +6,7 @@ from sqlalchemy.exc import NoResultFound
 from datetime import datetime
 import time
 from aiogram.types import Message
+from aiogram.types import InlineKeyboardMarkup,InlineKeyboardButton
 
 
 async def add_info(session,user_id,
@@ -45,10 +46,20 @@ async def found_book(session, book_title: str, message: Message) -> bool:
             f"<b>Рік:</b> {book.year}\n"
             f"<b>Жанр:</b> {book.genre}"
         )
-        await message.answer(response_text, parse_mode="HTML")
-        return True  # Книгу знайдено успішно
 
-    # 2. Нечіткий пошук (trigram)
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                    [
+                    InlineKeyboardButton(
+                        text=book_title,
+                        callback_data=f"item_{book.id}")
+                    ]
+                ]
+            )
+        await message.answer(response_text,reply_markup=keyboard,
+                             parse_mode="HTML")
+        return True 
+
     stmt = (
         select(Book)
         .where(Book.title.op('%')(book_title))
@@ -99,3 +110,4 @@ async def add_book(session,tg_id,book_query,message:Message):
 
     else:
         await message.answer('Наразі книга недоступна')
+

@@ -87,4 +87,4 @@ async def front_move(callback: CallbackQuery):
 async def update_info(callback:CallbackQuery):
   async with async_session_factroy() as session:
      await add_book(session,callback.from_user.id,
-              callback.data)
+              callback.data,callback.message)

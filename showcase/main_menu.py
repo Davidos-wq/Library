@@ -7,7 +7,7 @@ from aiogram import F
 from aiogram.fsm.state import State,StatesGroup
 from aiogram.fsm.context import FSMContext
 
-from showcase.scroll_system import move_page
+from showcase.scroll_system import move_page,moveuser_page
 from crud import found_book,add_book
 from database import async_session_factroy
 
@@ -21,8 +21,7 @@ def create_menu():
     builder = InlineKeyboardBuilder()
     builder.button(text="Показати всі книжки",callback_data="showall_0")
     builder.button(text="Знайти книгу",callback_data="found_book")
-    builder.button(text="Повернути книгу",callback_data="return_book")
-    builder.button(text="Подивитися свої книги",callback_data="show_yourbooks")
+    builder.button(text="Подивитися свої книги",callback_data="showyourbooks_0")
 
     builder.adjust(1)
 
@@ -49,20 +48,33 @@ async def show_result(message: Message, state: FSMContext):
     if is_found:
         await state.clear()
 
-
+#Показує меню всіх книг
 @menu_router.callback_query(F.data.startswith("showall_"))
 async def show_books(callback: CallbackQuery):
   curent_data = callback.data.split("_")
   num = int(curent_data[1])  # Тут буде 0 (або інше число, якщо передасте далі)
 
   async with async_session_factroy() as session:
-    await callback.message.edit_text(
+    await callback.message.answer(
         text="Книжки",
         reply_markup=await move_page(session, num),
     )
 
   await callback.answer()
 
+#Показує меню користувача книг
+@menu_router.callback_query(F.data.startswith("showyourbooks_"))
+async def showuser_book(callback:CallbackQuery):
+   curent_data = callback.data.split("_")
+   num = int(curent_data[1])
+
+   async with async_session_factroy() as session:
+      await callback.message.answer(text="Книжки користувача",
+                                   reply_markup=await moveuser_page(session,num,callback.from_user.id))
+
+   await callback.answer()
+      
+#Рухає меню каталогу всіх книг
 @menu_router.callback_query(
     F.data.contains("forward_") | F.data.contains("back_"))
 async def front_move(callback: CallbackQuery):
@@ -78,6 +90,26 @@ async def front_move(callback: CallbackQuery):
     await callback.message.edit_text(
         text="Книжки",
         reply_markup= await move_page(session, num),
+    )
+
+  await callback.answer()
+
+#Рухає меню книг користувача
+@menu_router.callback_query(
+      F.data.contains("userforward_") | F.data.contains("userback_"))
+async def user_move(callback:CallbackQuery):
+  curent_data = callback.data.split("_")
+  num = int(curent_data[1])
+
+  if curent_data[0] == "userforward":
+    num += 10
+  elif curent_data[0] == "userback":
+    num -= 10
+
+  async with async_session_factroy() as session:
+    await callback.message.edit_text(
+        text="Книжки",
+        reply_markup= await moveuser_page(session, num),
     )
 
   await callback.answer()

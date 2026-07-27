@@ -95,7 +95,7 @@ async def add_book(session,tg_id,book_query,message:Message):
     if not existing_borrow or existing_borrow<datetime.now():
 
         new_borrow = BorrowedBook(
-            user_id=int(message.from_user.id),
+            user_id=int(tg_id),
             book_id=book_id
         )
 

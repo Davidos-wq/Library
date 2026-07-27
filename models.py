@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column,relationship
 from sqlalchemy import text,select
-from sqlalchemy import ForeignKey,DateTime,Index
+from sqlalchemy import ForeignKey,DateTime,Index,BigInteger
 from typing import List
 from database import Base,engine,async_session_factroy
 from datetime import datetime,timedelta
@@ -42,7 +42,7 @@ class BorrowedBook(Base):
     __tablename__ = "borrowed_books"
 
     id:Mapped[int] = mapped_column(primary_key = True)
-    user_id:Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id:Mapped[int] = mapped_column(BigInteger,ForeignKey("users.tg_id"))
     book_id:Mapped[int] = mapped_column(ForeignKey("books.id"))
     
     time_bought: Mapped[datetime] = mapped_column(

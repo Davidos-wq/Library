@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 from showcase.main_menu import menu_router
+from showcase.fastcomands import fastcomand_router
 
 dotenv_path = find_dotenv()
 print(f"DEBUG: Файл .env знайдено за шляхом: {dotenv_path}")
@@ -27,6 +28,7 @@ async def main() -> None:
 
     dp.include_router(form_router)
     dp.include_router(menu_router)
+    dp.include_router(fastcomand_router)
     
     bot = Bot(token=token)
     await dp.start_polling(bot)

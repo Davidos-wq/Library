@@ -9,6 +9,7 @@ from crud import found_book
 async def move_page(session,command):
 
     builder = InlineKeyboardBuilder()
+    PAGE_SIZE = 10
 
     stmt = (select(Book).
             offset(command).
@@ -26,13 +27,15 @@ async def move_page(session,command):
                     )
     
     if command<total_books-10:
+        nextpage = PAGE_SIZE+command
         builder.add(InlineKeyboardButton
-                    (text="Вперед",callback_data=f"forward_{command}")
+                    (text="Вперед ➡️",callback_data=f"forward_{nextpage}")
                     )
     
     if command>=10:
+        previouspage = command-PAGE_SIZE
         builder.add(InlineKeyboardButton(
-                    text="Назад",callback_data=f"back_{command}"))
+                    text="⬅️ Назад",callback_data=f"back_{previouspage}"))
     
     builder.adjust(2)
 
@@ -60,7 +63,7 @@ async def moveuser_page(session, command: int, tg_id: int):
     for book in all_userbooks:
         builder.add(InlineKeyboardButton(
             text=book.book_info.title,
-            callback_data=f"showuserbook_{book.id}"
+            callback_data=f"showuserbook_{book.user_id}"
         ))
 
     builder.adjust(2)

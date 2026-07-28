@@ -80,10 +80,10 @@ async def front_move(callback: CallbackQuery):
   curent_data = callback.data.split("_")
   num = int(curent_data[1])
 
-  if curent_data[0] == "forward":
-    num += 10
-  elif curent_data[0] == "back":
-    num -= 10
+  # if curent_data[0] == "forward":
+  #   num += 10
+  # elif curent_data[0] == "back":
+  #   num -= 10
 
   async with async_session_factroy() as session:
     await callback.message.edit_text(

@@ -75,8 +75,7 @@ async def showuser_book(callback:CallbackQuery):
    await callback.answer()
       
 #Рухає меню каталогу всіх книг
-@menu_router.callback_query(
-    F.data.contains("forward_") | F.data.contains("back_"))
+@menu_router.callback_query(F.data.startswith(("forward_", "back_")))
 async def front_move(callback: CallbackQuery):
   curent_data = callback.data.split("_")
   num = int(curent_data[1])
@@ -101,15 +100,10 @@ async def user_move(callback:CallbackQuery):
   curent_data = callback.data.split("_")
   num = int(curent_data[1])
 
-  if curent_data[0] == "userforward":
-    num += 10
-  elif curent_data[0] == "userback":
-    num -= 10
-
   async with async_session_factroy() as session:
     await callback.message.edit_text(
         text="Книжки",
-        reply_markup= await moveuser_page(session, num),
+        reply_markup= await moveuser_page(session, num,int(callback.from_user.id)),
     )
 
   await callback.answer()

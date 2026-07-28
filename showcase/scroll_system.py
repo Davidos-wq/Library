@@ -38,43 +38,45 @@ async def move_page(session,command):
 
     return builder.as_markup()
 
-async def moveuser_page(session,command,tg_id):
+async def moveuser_page(session, command: int, tg_id: int):
+
+    PAGE_SIZE = 10
 
     builder = InlineKeyboardBuilder()
 
-    stmt = (select(User).
-            where(User.tg_id==tg_id).
-            options(
-                selectinload(User.user_books).
-                selectinload(BorrowedBook.book_info).
-                offset(command).
-                limit(10))
-            )
-            
+    stmt = (
+        select(BorrowedBook)
+        .where(BorrowedBook.user_id == tg_id)
+        .options(selectinload(BorrowedBook.book_info))
+        .offset(command)
+        .limit(PAGE_SIZE)
+    )
+    all_userbooks = (await session.execute(stmt)).scalars().all()
 
-    all_userbooks = await session.execute(stmt)
-    all_userbooks = all_userbooks.scalar_one_or_none()
+    count_stmt = select(func.count(BorrowedBook.id)).where(BorrowedBook.user_id == tg_id)
+    total_userbooks = await session.scalar(count_stmt) or 0
 
-    count_stmt = (
-    select(func.count(BorrowedBook.id))
-    .where(BorrowedBook.user_id == all_userbooks.id))
-    
-    total_userbooks = await session.scalar(count_stmt)
-
-    for book in all_userbooks.user_books:
-        builder.add(InlineKeyboardButton(text=book.book_info.title,
-                    callback_data=f"showuserbook_{book.id}"))
-
-    if total_userbooks%10==0:
-            builder.add(InlineKeyboardButton
-                        (text="Вперед",callback_data=f"userforward_{command}")
-                        )
-    if command>=10:
-            builder.add(InlineKeyboardButton(
-                        text="Назад",callback_data=f"userback_{command}"))
+    # 3. Додаємо книги у клавіатуру
+    for book in all_userbooks:
+        builder.add(InlineKeyboardButton(
+            text=book.book_info.title,
+            callback_data=f"showuserbook_{book.id}"
+        ))
 
     builder.adjust(2)
-    
+
+    nav_builder = InlineKeyboardBuilder()
+
+    if command >= PAGE_SIZE:
+        prev_offset = command - PAGE_SIZE
+        nav_builder.add(InlineKeyboardButton(text="⬅️ Назад", callback_data=f"userback_{prev_offset}"))
+
+    if command + PAGE_SIZE < total_userbooks:
+        next_offset = command + PAGE_SIZE
+        nav_builder.add(InlineKeyboardButton(text="Вперед ➡️", callback_data=f"userforward_{next_offset}"))
+
+    builder.attach(nav_builder)
+
     return builder.as_markup()
 
     

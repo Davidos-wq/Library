@@ -5,15 +5,15 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import Message
 from showcase.scroll_system import moveuser_page
 
-def retur_userbook(book_id):
+def retur_userbook():
 
     keyboard = InlineKeyboardBuilder()
 
     keyboard.add(InlineKeyboardButton(text="Видалити",
-                                      callback_data=f"Delete_{book_id}"))
+                                      callback_data=f"Delete"))
     
     keyboard.add(InlineKeyboardButton(text="Показати інформацію",
-                                      callback_data=f"OpenBook_{book_id}"))
+                                      callback_data=f"OpenBook"))
 
     keyboard.add(InlineKeyboardButton(text="Назад",callback_data="Back"))
 

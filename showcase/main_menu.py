@@ -8,6 +8,7 @@ from aiogram.fsm.state import State,StatesGroup
 from aiogram.fsm.context import FSMContext
 
 from showcase.scroll_system import move_page,moveuser_page
+from showcase.user_bookfunc import retur_userbook,agreement,delete
 from crud import found_book,add_book
 from database import async_session_factroy
 
@@ -114,3 +115,12 @@ async def update_info(callback:CallbackQuery):
   async with async_session_factroy() as session:
      await add_book(session,callback.from_user.id,
               callback.data,callback.message)
+
+
+@menu_router.callback_query(F.data.startswith("showuserbook_"))
+async def userbook_func(callback:CallbackQuery,state:FSMContext):
+   book_id = callback.data.split("_")
+   print(f"book_id:{book_id}")
+   await state.update_data(book_id=int(book_id[1]))
+   await callback.message.edit_reply_markup(
+    reply_markup=retur_userbook())

@@ -107,3 +107,4 @@ async def add_book(session,tg_id,book_query,message:Message):
     else:
         await message.answer('Наразі книга недоступна')
 
+

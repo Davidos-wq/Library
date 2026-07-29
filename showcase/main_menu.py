@@ -10,8 +10,10 @@ from aiogram.fsm.context import FSMContext
 from showcase.scroll_system import move_page,moveuser_page
 from crud import found_book,add_book
 from database import async_session_factroy
+from aiogram.filters.callback_data import CallbackData
 
 menu_router = Router()
+
 
 class Found(StatesGroup):
    book_name = State()
@@ -109,15 +111,7 @@ async def user_move(callback:CallbackQuery):
   await callback.answer()
 
 
-@menu_router.callback_query(F.data.contains("item_"))
-async def update_info(callback:CallbackQuery):
-  async with async_session_factroy() as session:
-     await add_book(session,callback.from_user.id,
-              callback.data,callback.message)
-
-
-
-
-# @menu_router.callback_query(F.data=="OpenBook")
-# async def open_book(callback:CallbackQuery,state:FSMContext):
-   
+@menu_router.callback_query(F.data.startswith("item_"))
+async def takebook(callback:CallbackQuery):
+   async with async_session_factroy() as session:
+    await add_book(session,callback.from_user.id,callback.data,callback.message)

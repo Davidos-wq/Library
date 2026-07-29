@@ -13,7 +13,7 @@ def retur_userbook():
                                       callback_data=f"Delete"))
     
     keyboard.add(InlineKeyboardButton(text="Показати інформацію",
-                                      callback_data=f"OpenBook"))
+                                      callback_data="OpenBook"))
 
     keyboard.add(InlineKeyboardButton(text="Назад",callback_data="Back"))
 

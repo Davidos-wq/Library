@@ -33,7 +33,7 @@ async def showbook_info(session,book_id,message:Message):
                         [
                         InlineKeyboardButton(
                             text="Повернутися",
-                            callback_data=f"back_touserbook")
+                            callback_data=f"touserbook")
                         ]
                     ]
                 )
@@ -46,5 +46,7 @@ async def delete_userbook(session,book_id):
     stmt = delete(BorrowedBook).where(BorrowedBook.id==book_id)
     await session.execute(stmt)
     await session.commit()
+
+
 
 

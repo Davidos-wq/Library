@@ -15,6 +15,11 @@ async def showbook_info(session,book_id,message:Message):
     result = await session.execute(stmt)
     book_res = result.scalar_one_or_none()
 
+    if book_res==None:
+        await message.answer("Нараз id книжки не знайдено")
+        return
+
+
     response_text = (
                 f"<b>Книгу знайдено!</b>\n\n"
                 f"<b>Назва:</b> {book_res.book_info.title}\n"
@@ -33,7 +38,7 @@ async def showbook_info(session,book_id,message:Message):
                     ]
                 )
 
-    await message.answer(response_text,reply_markup=keyboard)
+    await message.answer(response_text,reply_markup=keyboard,parse_mode="HTML")
 
 #Видалити книжку юзера
 async def delete_userbook(session,book_id):

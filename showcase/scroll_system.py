@@ -63,7 +63,7 @@ async def moveuser_page(session, command: int, tg_id: int):
     for book in all_userbooks:
         builder.add(InlineKeyboardButton(
             text=book.book_info.title,
-            callback_data=f"showuserbook_{book.user_id}"
+            callback_data=f"showuserbook_{book.id}"
         ))
 
     builder.adjust(2)
